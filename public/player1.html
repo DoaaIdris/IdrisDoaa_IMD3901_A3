@@ -35,8 +35,12 @@
             </a-entity>
 
             <a-entity class="ui" geometry="primitive:box; width:14; height:14; depth: 0.2;" material="color:white;" scale = "1.979 -0.459 0.496" position="0.006 8.5 -14.9944" rotation="0 0 180">
-                <a-entity text="value:Player1; 
-                          color:red; font:roboto; width:5; anchor:left; baseline:top; wrapCount:12;" position="6.524 3.793 0.237" rotation="0 0 180" scale="1.578 -5.621 1"></a-entity>
+                <a-entity text="value:Player1: ;  
+                          color:red; font:roboto; width:5; anchor:left; baseline:top; wrapCount:12;" id="player1count" position="6.361 3.793 0.237" rotation="0 0 180" scale="1.578 -5.621 1"></a-entity>
+                <a-entity text="value:Team: ; 
+                          color:purple; font:roboto; width:5; anchor:left; baseline:top; wrapCount:12;" id="teamcount" position="2.219 -1.636 0.237" rotation="0 0 180" scale="1.578 -5.621 1"></a-entity>
+                <a-entity text="value:Player2: ; 
+                          color:blue; font:roboto; width:5; anchor:left; baseline:top; wrapCount:12;" id="player2count" position="-1.230 3.793 0.237" rotation="0 0 180" scale="1.578 -5.621 1"></a-entity>          
             </a-entity>
 
             <a-entity environment="preset: forest; groundColor: #445; grid: cross"></a-entity>           
@@ -47,6 +51,10 @@
         <!--loads script after html-->
             
         <script>
+            var p1=0; //player 1
+            var p2=0; //player 2  
+            var pt =0; //team score  
+
             let socket = io();
 
             socket.on('connect', (userData) => {
@@ -99,6 +107,7 @@
                     //console.log(els);
                 
                         newItem.addEventListener('click', function(){
+                            newLength = els.pop(newItem);
                             socket.emit('purpleBox1');
                         });  
                         
@@ -132,8 +141,13 @@
                         console.log(newLength2);
                         console.log(els2);
 
+                        pt = els2.length;
+                        document.querySelector('#teamcount').setAttribute('text', {value:"Team:" + pt});
+                        console.log(pt);
+                       
                         if(purpleCube != null){
                             purpleCube.addEventListener('click', function(){
+                                newLength2 = els2.pop(purpleCube);
                                 socket.emit('changeRed');
                                 }); 
                         }   
@@ -160,16 +174,19 @@
 
                         redCube.setAttribute('id', 'purpleBox');
 
-
                         purpleCube  = document.querySelector('#purpleBox');
 
-                        newLength2 = els2.push( purpleCube);
+                        newLength2 = els2.push(purpleCube);
                         ids2 ++;
                         console.log(newLength2);
                         console.log(els2);
 
-                        if( purpleCube != null){
+                        pt = els2.length;
+                        document.querySelector('#teamcount').setAttribute('text', {value:"Team:" + pt});
+
+                        if(purpleCube != null){
                             purpleCube.addEventListener('click', function(){
+                                newLength2 = els2.pop(purpleCube);
                                 socket.emit('changeRed');
                                 }); 
                         }   
@@ -177,6 +194,10 @@
                        
                     
                 });
+                
+                let ids4= 0; 
+                var els4 = [];
+                let newLength4 = 0;
 
                 socket.on('redBox_changed', (data) => {
                     var sceneEl = document.querySelector('a-scene'); 
@@ -189,11 +210,31 @@
                         purpleCube.setAttribute('material', {color:colorStr});
 
                         purpleCube.setAttribute('id', 'myRedBox');
+
+                        redCube  = document.querySelector('#purpleBox');
+
+                        newLength4 = els4.push(redCube);
+                        ids4 ++;
+                        //console.log(newLength3);
+                        console.log(els3);
+
+                        pt -= (ids4/ids4);
+                        p1 += (ids2/ids2);
+                        document.querySelector('#teamcount').setAttribute('text', {value:"Team:" + pt});
+                        document.querySelector('#player1count').setAttribute('text', {value:"Player1:" + p1});
+
+                        if(redCube != null){
+                            redCube.addEventListener('click', function(){
+                                newLength4 = els4.pop(redCube);
+                            }); 
+                        }   
                         
                     }
                        
                     
                 });
+                
+                
 
                 socket.on('blueBox_changed', (data) => {
                     var sceneEl = document.querySelector('a-scene'); 
@@ -214,8 +255,14 @@
                         console.log(newLength3);
                         console.log(els3);
 
+                        pt -= (ids3/ids3);
+                        p2 += (ids2/ids2);
+                        document.querySelector('#teamcount').setAttribute('text', {value:"Team:" + pt});
+                        document.querySelector('#player2count').setAttribute('text', {value:"Player2:" + p2});
+
                         if(blueCube != null){
                             blueCube.addEventListener('click', function(){
+                                newLength3 = els3.pop(blueCube);
                                 socket.emit('disableBlue');
                                 }); 
                         }   
@@ -227,6 +274,8 @@
                 let ids3 = 0; 
                 var els3 = [];
                 let newLength3 = 0;
+
+                
 
                 socket.on('blueBox_disabled', (data) => {
                     var sceneEl = document.querySelector('a-scene'); 
@@ -244,10 +293,15 @@
 
                         newLength = els.push(purpleCube);
                         ids ++;
+
+                        p2 -= (ids/ids);
+                        document.querySelector('#player2count').setAttribute('text', {value:"Player2:" + p2});
+
                         //console.log(newLength);
                         //console.log(els);
                         if(purpleCube != null){
                             purpleCube.addEventListener('click', function(){
+                                newLength = els.pop(purpleCube);
                                 socket.emit('purpleBox1');
                             }); 
                         }
@@ -267,7 +321,20 @@
                         blueCube.setAttribute('class', 'box');
 
                         blueCube.setAttribute('id', 'redBox');
-                        
+
+                        newLength = els.push(purpleCube);
+                        ids ++;
+
+                        p1 -= (ids/ids);
+                        document.querySelector('#player1count').setAttribute('text', {value:"Player1:" + p1});
+
+                        //console.log(newLength);
+                        //console.log(els);
+                        if(purpleCube != null){
+                            purpleCube.addEventListener('click', function(){
+                                newLength = els.pop(purpleCube);
+                            }); 
+                        }
                     }
                        
                     
